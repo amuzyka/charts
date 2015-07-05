@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Timeline</title>
+
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js" charset="utf-8"></script>
+
+	<style type="text/css">
+	#timeline-container{
+		/*background:darkgreen;*/
+	}
+
+	#timeline{
+		position:absolute;
+		margin:auto;
+		left:0;
+		right:0;
+		bottom:0;
+		top:0;
+
+		background:blue;
+	}
+
+	</style>
+</head>
+<body>
+
+<div id="timeline-container"></div>
+
+<script type="text/javascript">
+
+	var width = 800,
+		height = 300;
+
+			
+	
+	var timeline = d3.select("#timeline-container").append("svg")
+													.attr("id", "timeline")	
+													.attr("width", width)
+													.attr("height", height);
+
+
+	var x = d3.scale.linear()
+			.domain([0, 21]) //domain of actual values
+    		.range([50, 750]); //spread to all width
+					
+
+	var x_axis = d3.svg.axis()
+			//.tickValues([1, 2, 3, 4, 5, 6, 7])
+			.ticks(21)
+			.scale(x);
+
+	var data = [
+		{date: new Date(2015,4,1)},
+    	{date: new Date(2015,1,1)},
+    	{date: new Date(2015,5,1)}
+	];
+
+	//returns min and maximun value in the given array using natural order
+	//equivalent to calling d3.min and d3.max simultaneously 
+	/*var xExtent = d3.extent(data, function (d) { return d.date; });
+	
+	var x = d3.time.scale()
+				.domain(xExtent)	
+
+				.range([50, 750]);
+
+	var x_axis = d3.svg.axis()
+
+						
+				  		.ticks(d3.time.monday, 2)
+					    .tickFormat(d3.time.format('%a %d'))
+						.tickSize(6, 0, 0)	
+
+						.scale(x);*/
+
+	timeline.append('g')
+		.attr("transform", "translate(0, 250)")	
+		.call(x_axis);																	
+
+</script>
+
+
+</body>
+</html>
