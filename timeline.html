@@ -9,7 +9,6 @@
 	#timeline-container{
 		/*background:darkgreen;*/
 	}
-
 	#timeline{
 		position:absolute;
 		margin:auto;
@@ -17,69 +16,86 @@
 		right:0;
 		bottom:0;
 		top:0;
-
-		background:blue;
+		background:rgba(105, 105, 105, 0.1);
 	}
-
 	</style>
+
 </head>
 <body>
 
 <div id="timeline-container"></div>
 
 <script type="text/javascript">
-
 	var width = 800,
 		height = 300;
-
 			
 	
 	var timeline = d3.select("#timeline-container").append("svg")
-													.attr("id", "timeline")	
-													.attr("width", width)
-													.attr("height", height);
-
-
-	var x = d3.scale.linear()
+			.attr("id", "timeline")	
+			.attr("width", width)
+			.attr("height", height);
+	/*var x = d3.scale.linear()
 			.domain([0, 21]) //domain of actual values
-    		.range([50, 750]); //spread to all width
+    		.range([50, 750]);*/ //spread to all width
 					
-
-	var x_axis = d3.svg.axis()
+	/*var x_axis = d3.svg.axis()
 			//.tickValues([1, 2, 3, 4, 5, 6, 7])
 			.ticks(21)
-			.scale(x);
+			.scale(x);*/
 
 	var data = [
-		{date: new Date(2015,4,1)},
-    	{date: new Date(2015,1,1)},
-    	{date: new Date(2015,5,1)}
+		{date: new Date(2015,6,1)},
+		{date: new Date(2015,7,1)}
 	];
 
 	//returns min and maximun value in the given array using natural order
 	//equivalent to calling d3.min and d3.max simultaneously 
-	/*var xExtent = d3.extent(data, function (d) { return d.date; });
+	var xExtent = d3.extent(data, function (d) { return d.date; });
 	
-	var x = d3.time.scale()
-				.domain(xExtent)	
 
-				.range([50, 750]);
+	var x = d3.time.scale()
+			  .domain(xExtent)	
+			  .range([50, 750]);
 
 	var x_axis = d3.svg.axis()
-
 						
-				  		.ticks(d3.time.monday, 2)
-					    .tickFormat(d3.time.format('%a %d'))
-						.tickSize(6, 0, 0)	
+				  		.ticks(d3.time.sunday)
 
-						.scale(x);*/
+					    .tickFormat(d3.time.format('%a %d'))
+						.tickSize(6, 0, 0)
+
+						.scale(x);
 
 	timeline.append('g')
 		.attr("transform", "translate(0, 250)")	
-		.call(x_axis);																	
+		.call(x_axis);
+
+
+	var lineCoordinates = [
+		{date: new Date(2015,6,25), width: 350},
+		{date: new Date(2015,6,15)}
+	];	
+
+	
+	
+	var r = timeline.append("rect")
+						  .attr("height", 20)
+						  .attr("width", lineCoordinates[0].width)
+						  
+                          .attr("x", x(lineCoordinates[0].date))
+                          .attr("y", 220)
+                       
+                          .attr("stroke-width", 1)
+                          .attr("stroke", "lightgrey")
+                          .style("fill", "lightseagreen");
+
+                         
+   
+
+                
 
 </script>
 
 
 </body>
-</html>
+</html
