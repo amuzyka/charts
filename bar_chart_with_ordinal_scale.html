@@ -7,11 +7,10 @@
 </head>
 <body>
 	<style type="text/css">
-
 			#bar_chart{
 				margin: auto;
   				position: absolute;
-                top: 0; left: 0; bottom: 0; right: 0;
+                		top: 0; left: 0; bottom: 0; right: 0;
 			}
 
 			.axis{
@@ -42,10 +41,6 @@
 
 			.domain{
 				display:none;
-			}
-
-			.tick{
-
 			}
 
 			line{
@@ -86,16 +81,13 @@
 			{wos: 2, customer: 2378}
 		];	
 
-
 		var x = d3.scale.ordinal()
 			.rangeRoundBands([0, width], .05)
 			.domain(data.map(function(d){return d.wos;}));
 
-		
 		var y = d3.scale.linear()
 			.range([height, 0])
 			.domain([ 0, d3.max(data, function(d){return d.customer;}) ]);
-		
 
 		var x_axis = d3.svg.axis()
 			.scale(x)
@@ -123,7 +115,6 @@
 			.attr('width', svgElementWidth)
 			.attr('height', svgElementHeight);
 
-		//appending axes	
 		chart.append('g')
 			.attr('class', 'x axis')
 			.attr('transform', 'translate(30,' + (height+15) + ')')
@@ -134,21 +125,16 @@
 			.attr('transform', 'translate(30, 10) rotate(0)')
 			.call(y_axis);	
 
-		
 		chart.selectAll('bar').data(data)
 			.enter()
 	            .append('g')
 	            	.attr('class', 'bar')
 	            	.attr('transform', 'translate(30, 10)')		
-				.append('rect')
-				.attr('x', function(d){return x(d.wos);})
-				.attr('y', function(d){return y(d.customer);})
-				.attr('width', x.rangeBand())
-				//.attr('width', 10)
-				.attr('height', function(d){return height - y(d.customer); });
-				
-
-
+		    .append('rect')
+			.attr('x', function(d){return x(d.wos);})
+			.attr('y', function(d){return y(d.customer);})
+			.attr('width', x.rangeBand())
+			.attr('height', function(d){return height - y(d.customer); });
 	</script>
 </body>
 </html>
