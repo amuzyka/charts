@@ -1,0 +1,154 @@
+<html>
+<head>
+	<title>Bar Chart with ordinal scale</title>
+	<script type="text/javascript" src='https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js'></script>
+
+
+</head>
+<body>
+	<style type="text/css">
+
+			#bar_chart{
+				margin: auto;
+  				position: absolute;
+                top: 0; left: 0; bottom: 0; right: 0;
+			}
+
+			.axis{
+				font: 10px sans-serif;
+			}
+
+			.axis path, 
+			.axis line{
+				fill: none;
+				stroke: darkgray;
+				shape-rendering: crispEdges;
+			}
+
+			text{
+				fill:darkgrey;
+				font-size: 11px;
+			}
+
+			rect{
+				fill: lightseagreen;
+				stroke-width: width:1; 
+				stroke:white;
+			}
+			rect:hover{
+				fill:crimson;
+				cursor:pointer;
+			}
+
+			.domain{
+				display:none;
+			}
+
+			.tick{
+
+			}
+
+			line{
+				stroke: darkgrey !important;
+				stroke-opacity: 0.5;
+			}
+
+		</style>
+
+	<div id='bar_chart_container'></div>
+
+	<script type="text/javascript">
+		var margin = {
+				top: 10,
+				bottom: 50,
+				left: 40,
+				right: 40
+			};
+
+		var svgElementWidth = 500,
+			svgElementHeight = 280;
+
+		var width = 500 - margin.left - margin.right,
+			height = 280 - margin.top - margin.bottom;
+
+		var data = [
+			{wos: 45, customer: 3498},
+			{wos: 21, customer: 9999},
+			{wos: 67, customer: 456},
+			{wos: 189, customer: 236},
+			{wos: 100, customer: 234},
+			{wos: 23, customer:678},
+			{wos: 1, customer: 8888},
+			{wos: 88, customer: 567},
+			{wos: 38, customer: 687},
+			{wos: 28, customer: 2222},
+			{wos: 299, customer: 2222},
+			{wos: 2, customer: 2378}
+		];	
+
+
+		var x = d3.scale.ordinal()
+			.rangeRoundBands([0, width], .05)
+			.domain(data.map(function(d){return d.wos;}));
+
+		
+		var y = d3.scale.linear()
+			.range([height, 0])
+			.domain([ 0, d3.max(data, function(d){return d.customer;}) ]);
+		
+
+		var x_axis = d3.svg.axis()
+			.scale(x)
+			.outerTickSize(0)
+			.innerTickSize(0)
+			.orient('bottom');
+
+		var max_value = d3.max(data, function(d){return d.customer;});
+			
+		var tickValues = [max_value];
+		for(var i = 0; i < 6; i++){
+			tickValues.push((max_value/6) * i);
+		}
+
+		var y_axis = d3.svg.axis()
+			.scale(y)
+			.orient('left')
+			.innerTickSize(-width)
+			.outerTickSize(0)
+			.tickValues(tickValues.reverse());
+
+		var chart = d3.select('#bar_chart_container')
+			.append('svg')
+			.attr('id', 'bar_chart')
+			.attr('width', svgElementWidth)
+			.attr('height', svgElementHeight);
+
+		//appending axes	
+		chart.append('g')
+			.attr('class', 'x axis')
+			.attr('transform', 'translate(30,' + (height+15) + ')')
+			.call(x_axis);
+
+		chart.append('g')
+			.attr('class', 'y axis')
+			.attr('transform', 'translate(30, 10) rotate(0)')
+			.call(y_axis);	
+
+		
+		chart.selectAll('bar').data(data)
+			.enter()
+	            .append('g')
+	            	.attr('class', 'bar')
+	            	.attr('transform', 'translate(30, 10)')		
+				.append('rect')
+				.attr('x', function(d){return x(d.wos);})
+				.attr('y', function(d){return y(d.customer);})
+				.attr('width', x.rangeBand())
+				//.attr('width', 10)
+				.attr('height', function(d){return height - y(d.customer); });
+				
+
+
+	</script>
+</body>
+</html>
