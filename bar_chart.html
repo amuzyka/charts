@@ -1,0 +1,115 @@
+<html>
+<head>
+	<title>Bar Chart</title>
+	<script type="text/javascript" src='https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js'></script>
+</head>
+	<body>
+		<style type="text/css">
+			#bar_chart{
+				margin: auto;
+  				position: absolute;
+                top: 0; left: 0; bottom: 0; right: 0;
+			}
+			.axis{
+				font: 10px sans-serif;
+			}
+			.axis path, 
+			.axis line{
+				fill: none;
+				stroke: darkgray;
+				shape-rendering: crispEdges;
+			}
+			rect{
+				fill: lightseagreen;
+				stroke-width: width:1; 
+				stroke:white;
+			}
+			rect:hover{
+				fill:crimson;
+				cursor:pointer;
+			}
+		</style>
+
+		<div id='bar_chart_container'></div>
+
+		<script type="text/javascript">
+			var margin = {
+				top: 10,
+				bottom: 50,
+				left: 10,
+				right: 10
+			};
+
+			var svgElementWidth = 500,
+				svgElementHeight = 350;
+
+			var width = 500 - margin.left - margin.right,
+				height = 350 - margin.top - margin.bottom;
+
+
+			var dataValues = [];
+			for(var i = 0; i < 30; i++){
+				dataValues2.push({value: i*8, date: new Date('2015-06-'+ (i+1)) });
+			} 
+				
+			var xExtent = d3.extent(dataValues2, function(d){ return d.date; });
+	
+			//spreading bar on the chart
+			var timeDistance = xExtent[1].getTime() - xExtent[0].getTime();
+			//for daily charts
+			var days = timeDistance / 86400000;
+			var barWidth = (width-80) / days;
+		
+			var x = d3.time.scale()
+					.domain(xExtent)
+					.range([margin.left, width-80]);					
+
+			var x_axis = d3.svg.axis()
+					.ticks(d3.time.day, 5)
+					.scale(x);
+			
+			var domainMax = d3.max(dataValues2, function(d){ return d.value; });
+			var tickValues = [domainMax];
+			for(var i = 0; i < 6; i++){ tickValues.push((domainMax/6) * i); }
+			
+			var y = d3.scale.linear()
+					//domain's second value supposed to be the max from dataValues
+					.domain([0, domainMax ]) 
+					.range([height-40, 0])
+						
+			var y_axis = d3.svg.axis()
+					.orient('left')
+					.tickValues(tickValues.reverse())
+					.scale(y);				
+
+			var bar_chart = d3.select('#bar_chart_container')
+					.append('svg')
+					.attr('id', 'bar_chart')
+					.attr('width', svgElementWidth)				
+					.attr('height', svgElementHeight);
+
+			bar_chart.append('g')
+					.attr('class', 'x axis')
+					.attr('transform', 'translate(60, 260)')		
+					.call(x_axis);
+
+			bar_chart.append('g')
+					.attr('class', 'y axis')
+					.attr('transform', 'translate(60, 10) rotate(0)') 
+					.call(y_axis);
+
+			bar_chart.selectAll('bar').data(dataValues2)
+				.enter()
+					.append('g')	
+					.attr('class', 'bar')
+					.attr('transform', 'translate(60, 10)')//hardcoded position!!!
+
+					.append('rect')
+					.attr('width', barWidth) 					
+					.attr('height', function(d){ return height - y(d.value-40)})
+					.attr('y', function(d){ return y(d.value); })						
+					.attr('x', function(d){ return x(d.date)-(barWidth/2); }); 
+
+ 		</script>
+	</body>
+</html>
