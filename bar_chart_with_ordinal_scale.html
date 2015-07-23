@@ -2,15 +2,17 @@
 <head>
 	<title>Bar Chart with ordinal scale</title>
 	<script type="text/javascript" src='https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js'></script>
+	<script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
 
 
 </head>
 <body>
 	<style type="text/css">
+
 			#bar_chart{
 				margin: auto;
   				position: absolute;
-                		top: 0; left: 0; bottom: 0; right: 0;
+                top: 0; left: 0; bottom: 0; right: 0;
 			}
 
 			.axis{
@@ -43,9 +45,39 @@
 				display:none;
 			}
 
+			
 			line{
 				stroke: darkgrey !important;
 				stroke-opacity: 0.5;
+			}
+
+			.d3-tip {
+			  line-height: 1;
+			  font-weight: bold;
+			  padding: 12px;
+			  background: rgba(0, 0, 0, 0.8);
+			  color: #fff;
+			  border-radius: 2px;
+			}
+
+			/* Creates a small triangle extender for the tooltip */
+			.d3-tip:after {
+			  box-sizing: border-box;
+			  display: inline;
+			  font-size: 10px;
+			  width: 100%;
+			  line-height: 1;
+			  color: rgba(0, 0, 0, 0.8);
+			  content: "\25BC";
+			  position: absolute;
+			  text-align: center;
+			}
+
+			/* Style northward tooltips differently */
+			.d3-tip.n:after {
+			  margin: -1px 0 0 0;
+			  top: 100%;
+			  left: 0;
 			}
 
 		</style>
@@ -74,20 +106,21 @@
 			{wos: 100, customer: 234},
 			{wos: 23, customer:678},
 			{wos: 1, customer: 8888},
-			{wos: 88, customer: 567},
-			{wos: 38, customer: 687},
-			{wos: 28, customer: 2222},
+			{wos: 3, customer: 8888},
 			{wos: 299, customer: 2222},
 			{wos: 2, customer: 2378}
 		];	
 
+
 		var x = d3.scale.ordinal()
-			.rangeRoundBands([0, width], .05)
+			.rangeRoundBands([0, width], .5)
 			.domain(data.map(function(d){return d.wos;}));
 
+		
 		var y = d3.scale.linear()
 			.range([height, 0])
 			.domain([ 0, d3.max(data, function(d){return d.customer;}) ]);
+		
 
 		var x_axis = d3.svg.axis()
 			.scale(x)
@@ -109,12 +142,23 @@
 			.outerTickSize(0)
 			.tickValues(tickValues.reverse());
 
+
+		var tip = d3.tip()
+  			.attr('class', 'd3-tip')
+  			.offset([-10, 0])
+  			.html(function(d) {
+    			return "<strong>Frequency:</strong> <span style='color:red'>" + d.customer + "</span>";
+  		})			
+
 		var chart = d3.select('#bar_chart_container')
 			.append('svg')
 			.attr('id', 'bar_chart')
 			.attr('width', svgElementWidth)
 			.attr('height', svgElementHeight);
 
+		chart.call(tip);	
+
+		//appending axes	
 		chart.append('g')
 			.attr('class', 'x axis')
 			.attr('transform', 'translate(30,' + (height+15) + ')')
@@ -125,16 +169,24 @@
 			.attr('transform', 'translate(30, 10) rotate(0)')
 			.call(y_axis);	
 
+		
 		chart.selectAll('bar').data(data)
 			.enter()
 	            .append('g')
 	            	.attr('class', 'bar')
 	            	.attr('transform', 'translate(30, 10)')		
-		    .append('rect')
-			.attr('x', function(d){return x(d.wos);})
-			.attr('y', function(d){return y(d.customer);})
-			.attr('width', x.rangeBand())
-			.attr('height', function(d){return height - y(d.customer); });
+				.append('rect')
+				.attr('x', function(d){return x(d.wos);})
+				.attr('y', function(d){return y(d.customer);})
+				.attr('width', x.rangeBand())
+				//.attr('width', 10)
+				.attr('height', function(d){return height - y(d.customer); })
+
+				.on('mouseover', tip.show)
+      			.on('mouseout', tip.hide);
+				
+
+
 	</script>
 </body>
 </html>
