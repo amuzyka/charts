@@ -1,0 +1,205 @@
+<html>
+<head>
+	<title>Grouped Bar Chart with ordinal scale</title>
+	<script type="text/javascript" src='https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js'></script>
+	<script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
+</head>
+<body>
+	<style type="text/css">
+			#bar_chart{
+				margin: auto;
+  				position: absolute;
+                top: 0; left: 0; bottom: 0; right: 0;
+			}
+			.axis{
+				font: 10px sans-serif;
+			}
+			.axis path, 
+			.axis line{
+				fill: none;
+				stroke: darkgray;
+				shape-rendering: crispEdges;
+			}
+			text{
+				fill:darkgrey;
+				font-size: 11px;
+			}
+			rect{
+				fill: lightseagreen;
+			}
+			rect:hover{
+				fill:crimson;
+				cursor:pointer;
+			}
+			.domain{
+				display:none;
+			}
+			line{
+				stroke: darkgrey !important;
+				stroke-opacity: 0.5;
+			}
+			.d3-tip {
+			  line-height: 1;
+			  font-weight: bold;
+			  padding: 12px;
+			  background: rgba(0, 0, 0, 0.8);
+			  color: #fff;
+			  border-radius: 2px;
+			}
+			/* Creates a small triangle extender for the tooltip */
+			.d3-tip:after {
+			  box-sizing: border-box;
+			  display: inline;
+			  font-size: 10px;
+			  width: 100%;
+			  line-height: 1;
+			  color: rgba(0, 0, 0, 0.8);
+			  content: "\25BC";
+			  position: absolute;
+			  text-align: center;
+			}
+
+			/* Style northward tooltips differently */
+			.d3-tip.n:after {
+			  margin: -1px 0 0 0;
+			  top: 100%;
+			  left: 0;
+			}
+
+		</style>
+
+	<div id='bar_chart_container'></div>
+
+	<script type="text/javascript">
+		var margin = {
+				top: 10,
+				bottom: 50,
+				left: 40,
+				right: 40
+		};
+
+		var svgElementWidth = 500,
+			svgElementHeight = 280;
+
+		var width = 500 - margin.left - margin.right,
+			height = 280 - margin.top - margin.bottom;
+
+		var number_of_series = 2; 
+
+		var data = [
+			[20, 98, 23, 56, 100],
+			[10, 78, 78, 56, 88]
+		];
+
+
+		var x0 = d3.scale.ordinal()
+			.domain(d3.range(data[0].length+1))
+			.rangeBands([0, width], .5);
+			
+		var x1 = d3.scale.ordinal()
+			.domain(d3.range(number_of_series))
+			.rangeBands([0, x0.rangeBand()]);	
+
+		var y = d3.scale.linear()
+			.range([height, 0])
+			.domain([ 0, 100]);
+
+		var x_axis = d3.svg.axis()
+			.scale(x0)
+			.outerTickSize(0)
+			.innerTickSize(0)
+			.orient('bottom');
+
+		var max_value = 100;
+			
+		var tickValues = [max_value];
+		for(var i = 0; i < 6; i++){
+			tickValues.push((max_value/6) * i);
+		}
+
+		var y_axis = d3.svg.axis()
+			.scale(y)
+			.orient('left')
+			.innerTickSize(-width)
+			.outerTickSize(0)
+			.tickValues(tickValues.reverse());
+
+
+		var tip = d3.tip()
+  			.attr('class', 'd3-tip')
+  			.offset([-10, 0])
+  			.html(function(d) {
+    			return "<strong>Frequency:</strong> <span style='color:red'>" + d + "</span>";
+  		});		
+
+		var chart = d3.select('#bar_chart_container')
+			.append('svg')
+			.attr('id', 'bar_chart')
+			.attr('width', svgElementWidth)
+			.attr('height', svgElementHeight);
+
+		chart.call(tip);
+
+		//add shadow filter
+		var filter = chart.append('defs')
+			 .append('filter')
+			 	.attr('id', 'filter-shadow')		
+			 	.attr('x', '0')		
+			 	.attr('y', '0')		
+			 	.attr('width', '200%')		
+			 	.attr('height', '200%');
+
+		filter.append('feOffset')
+				.attr('result', 'offOut')	 			
+				.attr('in', 'SourceGraphic')	 			
+				.attr('dx', '5')	 			
+				.attr('dy', '5');
+		
+		filter.append('feColorMatrix')
+				.attr('result', 'matrixOut')			 			
+				.attr('in', 'offOut')			 			
+				.attr('type', 'matrix')			 			
+				.attr('values', '0 0 0 0 0  0 0 0 0 0  	0 0 0 0 0   0 0 0 0.2 0');
+
+		filter.append('feBlend')
+				.attr('in', 'SourceGraphic')						 			
+				.attr('in2', 'matrixOut')						 			
+				.attr('mode', 'normal');						 			
+
+		//appending axes	
+		chart.append('g')
+			.attr('class', 'x axis')
+			.attr('transform', 'translate(30,' + (height+15) + ')')
+			.call(x_axis);
+
+		chart.append('g')
+			.attr('class', 'y axis')
+			.attr('transform', 'translate(30, 10) rotate(0)')
+			.call(y_axis);	
+		
+		chart.selectAll('bar').data(data)
+			.enter()
+	            .append('g')
+	            	.attr('class', function(d, i){ return i; })
+	            	.attr('transform', function(d, i){ return "translate(" + (x1(i) + 30) + ",10)"; })	
+
+	            .selectAll('rect')
+      			.data(function(d){ return d; })
+      			.enter()
+					.append('rect')
+						.attr('x', function(d, i){return x0(i);})
+						.attr('y', y)
+						.attr('width', x1.rangeBand())
+						.attr('height', function(d){return height - y(d); })
+						.on('mouseover', tip.show)
+	      				.on('mouseout', tip.hide)
+	      				.attr('filter', 'url(#filter-shadow)');
+		
+
+	</script>
+</body>
+</html>
+
+
+
+
